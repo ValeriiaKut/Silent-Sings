@@ -9,7 +9,7 @@ import 'package:handle_hero/bloc/level/level_event.dart';
 import 'package:handle_hero/ui/home/camera_guess_screen.dart';
 import 'package:handle_hero/ui/home/account_profile_page.dart';
 import 'package:handle_hero/ui/home/dictionary_tab.dart';
-import 'package:handle_hero/ui/modules/module1/level_one/level_overview_screen.dart';
+import 'package:handle_hero/ui/modules/overview/level_overview_screen.dart';
 import 'package:handle_hero/utils/my_images.dart';
 import 'package:handle_hero/widgets/level_button.dart';
 import 'package:handle_hero/widgets/treasure_ui.dart';
@@ -301,6 +301,7 @@ class _HomePageState extends State<HomePage> {
             currentIndex: _selectedTab,
             onTap: (index) => setState(() => _selectedTab = index),
             type: BottomNavigationBarType.fixed,
+            elevation: 0,
             backgroundColor: Colors.transparent,
             selectedItemColor: const Color(0xFFE3D9AA),
             unselectedItemColor: Colors.white,

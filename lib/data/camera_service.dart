@@ -3,10 +3,38 @@ import 'package:flutter/widgets.dart';
 import 'package:hand_detection/hand_detection.dart' as hand;
 import 'package:handle_hero/data/letter_classifier.dart';
 
-class CameraService {
+abstract interface class CameraServiceContract {
+  CameraController? get controller;
+  bool get canSwitchCamera;
+  bool get isClassifierReady;
+  String? get classifierError;
+  bool get isFrontCamera;
+
+  Future<void> initialize({
+    required void Function(List<hand.Hand> hands, Size size, String? letter)
+    onHands,
+  });
+
+  Future<void> switchCamera({
+    required void Function(List<hand.Hand> hands, Size size, String? letter)
+    onHands,
+  });
+
+  Future<XFile?> capture();
+  Future<void> resumeDetection({
+    required void Function(List<hand.Hand> hands, Size size, String? letter)
+    onHands,
+  });
+  Future<void> pause();
+  Future<void> dispose();
+}
+
+class CameraService implements CameraServiceContract {
+  @override
   CameraController? controller;
   hand.HandDetector? _detector;
   LetterClassifier? _letterClassifier;
+  @override
   String? classifierError;
   static const _predictionWindow = 7;
   static const _requiredPredictionVotes = 5;
@@ -18,11 +46,15 @@ class CameraService {
   String? _stablePrediction;
   DateTime _lastProcessedAt = DateTime.fromMillisecondsSinceEpoch(0);
 
+  @override
   bool get canSwitchCamera => _cameras.length > 1;
+  @override
   bool get isClassifierReady => _letterClassifier != null;
+  @override
   bool get isFrontCamera =>
       _activeCamera?.lensDirection == CameraLensDirection.front;
 
+  @override
   Future<void> initialize({
     CameraDescription? preferredCamera,
     required void Function(List<hand.Hand> hands, Size size, String? letter)
@@ -71,6 +103,7 @@ class CameraService {
     await _startHandDetection(onHands);
   }
 
+  @override
   Future<void> switchCamera({
     required void Function(List<hand.Hand> hands, Size size, String? letter)
     onHands,
@@ -86,6 +119,7 @@ class CameraService {
     await initialize(preferredCamera: next, onHands: onHands);
   }
 
+  @override
   Future<XFile?> capture() async {
     final activeController = controller;
     if (activeController == null || !activeController.value.isInitialized) {
@@ -97,13 +131,16 @@ class CameraService {
     return activeController.takePicture();
   }
 
+  @override
   Future<void> resumeDetection({
     required void Function(List<hand.Hand> hands, Size size, String? letter)
     onHands,
   }) => _startHandDetection(onHands);
 
+  @override
   Future<void> pause() => _disposeController();
 
+  @override
   Future<void> dispose() async {
     try {
       await _disposeController();

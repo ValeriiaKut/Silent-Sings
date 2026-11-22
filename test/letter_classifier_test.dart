@@ -32,4 +32,19 @@ void main() {
       expect(left[index * 2 + 1], closeTo(right[index * 2 + 1], 1e-6));
     }
   });
+
+  test('returns null when landmarks are incomplete', () {
+    expect(landmarkFeatures([0, 1], [0, 1], isLeft: false), isNull);
+  });
+
+  test('returns null when palm scale is zero', () {
+    expect(
+      landmarkFeatures(
+        List<double>.filled(21, 5),
+        List<double>.filled(21, 5),
+        isLeft: false,
+      ),
+      isNull,
+    );
+  });
 }

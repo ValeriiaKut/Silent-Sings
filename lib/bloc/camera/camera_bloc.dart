@@ -14,15 +14,14 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     this._cameraService, {
     required int challengeIndex,
     this.practiceMode = false,
-  })
-    : challengeIndex = challengeIndex.clamp(0, 2).toInt(),
-      super(
-        CameraState(
-          challengeLetters: _makeChallengeLetters(
-            challengeIndex.clamp(0, 2).toInt(),
-          ),
-        ),
-      ) {
+  }) : challengeIndex = challengeIndex.clamp(0, 2).toInt(),
+       super(
+         CameraState(
+           challengeLetters: _makeChallengeLetters(
+             challengeIndex.clamp(0, 2).toInt(),
+           ),
+         ),
+       ) {
     on<CameraStarted>(_onStarted);
     on<CameraChallengeRestarted>(_onChallengeRestarted);
     on<CameraRetryRequested>(_onRetryRequested);
@@ -33,7 +32,7 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     on<CameraHandsUpdated>(_onHandsUpdated);
   }
 
-  final CameraService _cameraService;
+  final CameraServiceContract _cameraService;
   final int challengeIndex;
   final bool practiceMode;
   String? _lastScoredPrediction;
@@ -254,7 +253,8 @@ class CameraBloc extends Bloc<CameraEvent, CameraState> {
     if (!hasHand) {
       feedback = null;
       clearFeedback = true;
-    } else if (!practiceMode && !state.isChallengeOver &&
+    } else if (!practiceMode &&
+        !state.isChallengeOver &&
         event.predictedLetter != null &&
         event.predictedLetter != _lastScoredPrediction) {
       final prediction = event.predictedLetter!;

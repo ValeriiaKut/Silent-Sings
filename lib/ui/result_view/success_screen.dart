@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:handle_hero/ui/modules/module1/level_one/find_sign_screen.dart';
+import 'package:handle_hero/ui/modules/exercises/find_sign_screen.dart';
 import 'package:handle_hero/utils/my_images.dart';
 import 'package:handle_hero/widgets/treasure_ui.dart';
 

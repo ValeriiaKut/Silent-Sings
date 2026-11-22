@@ -6,7 +6,7 @@ import 'package:handle_hero/bloc/home/home_event.dart';
 import 'package:handle_hero/bloc/home/home_state.dart';
 import 'package:handle_hero/bloc/level/level_bloc.dart';
 import 'package:handle_hero/bloc/level/level_event.dart';
-import 'package:handle_hero/ui/modules/module1/level_one/level_overview_screen.dart';
+import 'package:handle_hero/ui/modules/overview/level_overview_screen.dart';
 import 'package:handle_hero/utils/my_images.dart';
 import 'package:handle_hero/widgets/treasure_ui.dart';
 
