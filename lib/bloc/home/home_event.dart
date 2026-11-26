@@ -24,3 +24,11 @@ final class CoinsBalanceSynced extends HomeEvent {
 
   CoinsBalanceSynced(this.userId, this.coins);
 }
+
+final class CoinOperationFailed extends HomeEvent {
+  final String message;
+
+  CoinOperationFailed(this.message);
+}
+
+final class CoinErrorCleared extends HomeEvent {}

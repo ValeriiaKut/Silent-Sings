@@ -17,6 +17,7 @@ import 'package:handle_hero/widgets/letter_sign.dart';
 import 'package:handle_hero/widgets/lives_bar.dart';
 import 'package:handle_hero/widgets/module_completion_dialog.dart';
 import 'package:handle_hero/widgets/out_of_lives_dialog.dart';
+import 'package:handle_hero/widgets/treasure_ui.dart';
 
 class CompleteSentenceScreen extends StatelessWidget {
   const CompleteSentenceScreen({super.key, required this.moduleIndex});
@@ -157,26 +158,21 @@ class _Ex4View extends StatelessWidget {
                         Expanded(
                           child: Center(
                             child: Transform.translate(
-                              offset: const Offset(0, -55),
+                              offset: const Offset(0, 10),
                               child: ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 560),
                                 child: SizedBox(
                                   width: double.infinity,
-                                  child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 18,
-                                    vertical: 28,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF34382D),
-                                    border: Border.all(
-                                      color: const Color(0xFF7C806C),
-                                      width: 4,
-                                    ),
-                                  ),
-                                    child: _sentenceText(
-                                      question,
-                                      revealAnswer: state.isCorrect == true,
+                                  child: TreasureWindow(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                        vertical: 18,
+                                      ),
+                                      child: _sentenceText(
+                                        question,
+                                        revealAnswer: state.isCorrect == true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -231,9 +227,9 @@ class _Ex4View extends StatelessWidget {
     final mistakes = context.read<LevelBloc>().state.mistakes;
     final reward = switch (mistakes) {
       0 => 20,
-      1 => 10,
-      2 => 15,
-      _ => 0,
+      1 => 15,
+      2 => 10,
+      _ => 5,
     };
     context.read<HomeBloc>().add(CoinsEarned(reward));
     showModuleCompletionDialog(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,17 +33,65 @@ class _FriendsPageState extends State<FriendsPage> {
   bool _searching = false;
   bool _submitting = false;
   bool _loadingData = true;
+  int _initialRequestSnapshots = 0;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _incomingSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _outgoingSubscription;
 
   @override
   void initState() {
     super.initState();
-    _loadRequests();
+    _watchRequests();
   }
 
   @override
   void dispose() {
+    _incomingSubscription?.cancel();
+    _outgoingSubscription?.cancel();
     _idController.dispose();
     super.dispose();
+  }
+
+  void _watchRequests() {
+    void handleError(Object error) {
+      if (!mounted) return;
+      setState(() {
+        _dataError = error is FirebaseException
+            ? _firestoreError(error)
+            : 'Could not load friends. Please retry.';
+        _loadingData = false;
+      });
+    }
+
+    void markLoaded() {
+      _initialRequestSnapshots++;
+      if (mounted && _initialRequestSnapshots >= 2 && _loadingData) {
+        setState(() => _loadingData = false);
+      }
+    }
+
+    _incomingSubscription = _requests
+        .where('recipientId', isEqualTo: widget.userId)
+        .snapshots()
+        .listen((snapshot) {
+          if (!mounted) return;
+          setState(() {
+            _incoming = snapshot.docs;
+            _dataError = null;
+          });
+          markLoaded();
+        }, onError: handleError);
+
+    _outgoingSubscription = _requests
+        .where('senderId', isEqualTo: widget.userId)
+        .snapshots()
+        .listen((snapshot) {
+          if (!mounted) return;
+          setState(() {
+            _outgoing = snapshot.docs;
+            _dataError = null;
+          });
+          markLoaded();
+        }, onError: handleError);
   }
 
   Future<void> _loadRequests() async {
@@ -359,6 +409,19 @@ class _FriendsPageState extends State<FriendsPage> {
                 const Center(child: CircularProgressIndicator())
               else ...[
                 _RequestSection(
+                  title: 'YOUR FRIENDS',
+                  emptyText: 'Accepted friends will appear here.',
+                  requests: accepted,
+                  currentUserId: widget.userId,
+                  submitting: _submitting,
+                  onAccept: (_) {},
+                  onDecline: (_) {},
+                  incoming: false,
+                  accepted: true,
+                  onGift: (friendId) => _sendGift(friendId),
+                ),
+                const SizedBox(height: 16),
+                _RequestSection(
                   title: 'FRIEND REQUESTS',
                   emptyText: 'No incoming requests.',
                   requests: pendingIncoming,
@@ -378,19 +441,6 @@ class _FriendsPageState extends State<FriendsPage> {
                   onAccept: (_) {},
                   onDecline: (_) {},
                   incoming: false,
-                ),
-                const SizedBox(height: 16),
-                _RequestSection(
-                  title: 'YOUR FRIENDS',
-                  emptyText: 'Accepted friends will appear here.',
-                  requests: accepted,
-                  currentUserId: widget.userId,
-                  submitting: _submitting,
-                  onAccept: (_) {},
-                  onDecline: (_) {},
-                  incoming: false,
-                  accepted: true,
-                  onGift: (friendId) => _sendGift(friendId),
                 ),
               ],
             ],

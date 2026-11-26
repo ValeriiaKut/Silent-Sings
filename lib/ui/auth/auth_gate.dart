@@ -73,12 +73,22 @@ class _AuthGateState extends State<AuthGate> {
       );
       return null;
     } on FirebaseAuthException catch (error) {
+      // Firebase Auth can persist the session even when the request reports a
+      // late error. If the requested account is now active, let AuthGate route
+      // into the app instead of showing a misleading login failure.
+      final activeEmail = _auth.currentUser?.email?.trim().toLowerCase();
+      if (activeEmail == email.trim().toLowerCase()) return null;
       return switch (error.code) {
         'invalid-email' => 'Please enter a valid email address.',
         'user-not-found' || 'wrong-password' || 'invalid-credential' =>
           'Email or password is incorrect.',
         'network-request-failed' => 'Check your internet connection and try again.',
         'too-many-requests' => 'Too many attempts. Please try again later.',
+        'operation-not-allowed' || 'configuration-not-found' =>
+          'Email/password sign-in is not enabled for this Firebase project.',
+        'app-not-authorized' =>
+          'This app is not authorized in Firebase. Check its registered platform ID.',
+        'user-disabled' => 'This account is disabled in Firebase Authentication.',
         _ => 'Could not log in (${error.code}).',
       };
     }

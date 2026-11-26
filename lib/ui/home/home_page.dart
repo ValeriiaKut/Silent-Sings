@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:handle_hero/ui/home/friends_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:handle_hero/bloc/home/home_bloc.dart';
+import 'package:handle_hero/bloc/home/home_event.dart';
 import 'package:handle_hero/bloc/home/home_state.dart';
 import 'package:handle_hero/bloc/level/level_bloc.dart';
 import 'package:handle_hero/bloc/level/level_event.dart';
@@ -114,8 +115,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return BlocListener<HomeBloc, HomeState>(
+      listenWhen: (previous, current) =>
+          current.coinError != null && current.coinError != previous.coinError,
+      listener: (context, state) {
+        final message = state.coinError;
+        if (message == null) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), duration: const Duration(seconds: 8)),
+        );
+        context.read<HomeBloc>().add(CoinErrorCleared());
+      },
+      child: SafeArea(
+        child: Scaffold(
         appBar: _selectedTab == 2
             ? AppBar(
                 toolbarHeight: 60,
@@ -333,6 +345,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

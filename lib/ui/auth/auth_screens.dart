@@ -304,8 +304,12 @@ class _AuthFormState extends State<_AuthForm> {
     }
     if (!mounted) return;
     if (error != null) {
+      FocusScope.of(context).unfocus();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error)),
+        SnackBar(
+          content: Text(error),
+          duration: const Duration(seconds: 8),
+        ),
       );
       return;
     }

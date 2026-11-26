@@ -42,9 +42,9 @@ class _MixedChallengeView extends StatelessWidget {
     final mistakes = context.read<LevelBloc>().state.mistakes;
     final reward = switch (mistakes) {
       0 => 20,
-      1 => 10,
-      2 => 15,
-      _ => 0,
+      1 => 15,
+      2 => 10,
+      _ => 5,
     };
     context.read<HomeBloc>().add(CoinsEarned(reward));
     showModuleCompletionDialog(
